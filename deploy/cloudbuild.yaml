@@ -22,7 +22,7 @@ steps:
           --platform managed \
           --allow-unauthenticated \
           --set-secrets=SECRET_KEY=${_SECRET_KEY_SECRET}:latest,DATABASE_URL=${_DATABASE_URL_SECRET}:latest \
-          --set-env-vars=ENVIRONMENT=production,COOKIE_SECURE=true,FRONTEND_ORIGIN=${_FRONTEND_ORIGIN},GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},GOOGLE_REDIRECT_URI=${_FRONTEND_ORIGIN}/api/auth/google/callback \
+          --set-env-vars=ENVIRONMENT=production,COOKIE_SECURE=true,FRONTEND_ORIGIN=${_FRONTEND_ORIGIN} \
           --memory 512Mi \
           --cpu 1 \
           --max-instances 10
@@ -37,9 +37,9 @@ substitutions:
   # Set these as Cloud Build triggers substitutions or Secret Manager secrets.
   _SECRET_KEY_SECRET: quran-secret-key
   _DATABASE_URL_SECRET: quran-database-url
-  _FRONTEND_ORIGIN: https://YOUR-SERVICE-URL.a.run.app
-  _GOOGLE_CLIENT_ID: ""
-  _GOOGLE_CLIENT_SECRET: ""
+  _FRONTEND_ORIGIN: https://quran-tracker-357139153756.us-central1.run.app
+  # Google sign-in is not enabled yet. When it is, add GOOGLE_CLIENT_ID and
+  # GOOGLE_CLIENT_SECRET here and to --set-env-vars above (plus GOOGLE_REDIRECT_URI).
 
 options:
   logging: CLOUD_LOGGING_ONLY
