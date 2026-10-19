@@ -16,7 +16,7 @@ from ..database import get_db
 from ..deps import ACCESS_COOKIE, CSRF_COOKIE, get_current_user, require_csrf
 from ..models import RefreshToken, User
 from ..rate_limit import limiter
-from ..schemas import AuthResponse, LoginRequest, SignupRequest, UserOut
+from ..schemas import AuthResponse, LoginRequest, Preferences, SignupRequest, UserOut
 from ..security import (
     create_access_token,
     decode_access_token,
@@ -57,6 +57,11 @@ def _user_out(user: User) -> UserOut:
         display_name=user.display_name,
         email_verified=user.email_verified,
         has_google=user.google_sub is not None,
+        preferences=Preferences(
+            mushaf=user.mushaf,
+            theme=user.theme,
+            font_scale=user.font_scale,
+        ),
     )
 
 

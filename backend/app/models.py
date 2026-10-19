@@ -8,6 +8,7 @@ from sqlalchemy import (
     Boolean,
     CheckConstraint,
     DateTime,
+    Float,
     ForeignKey,
     Integer,
     String,
@@ -26,6 +27,11 @@ def _utcnow() -> datetime:
 
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = (
+        CheckConstraint("mushaf IN ('v1', 'v2', 'v4')", name="ck_user_mushaf"),
+        CheckConstraint("theme IN ('light', 'dark')", name="ck_user_theme"),
+        CheckConstraint("font_scale >= 0.5 AND font_scale <= 2.5", name="ck_user_font_scale"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True, nullable=False)
@@ -34,6 +40,9 @@ class User(Base):
     display_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
     google_sub: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    mushaf: Mapped[str] = mapped_column(String(8), default="v4", server_default="v4", nullable=False)
+    theme: Mapped[str] = mapped_column(String(8), default="light", server_default="light", nullable=False)
+    font_scale: Mapped[float] = mapped_column(Float, default=1.0, server_default="1.0", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow, onupdate=_utcnow, nullable=False

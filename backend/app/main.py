@@ -14,7 +14,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from .config import settings
 from .mushaf import load_words_meta
 from .rate_limit import limiter
-from .routers import auth, marks
+from .routers import auth, marks, preferences
 
 DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
 
@@ -85,6 +85,7 @@ async def security_headers(request: Request, call_next):
 
 app.include_router(auth.router)
 app.include_router(marks.router)
+app.include_router(preferences.router)
 
 
 @app.get("/api/health", tags=["health"])

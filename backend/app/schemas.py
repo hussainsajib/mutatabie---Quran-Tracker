@@ -22,6 +22,18 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=128)
 
 
+class Preferences(BaseModel):
+    mushaf: Literal["v1", "v2", "v4"] = "v4"
+    theme: Literal["light", "dark"] = "light"
+    font_scale: float = Field(default=1.0, ge=0.5, le=2.5)
+
+
+class PreferencesUpdate(BaseModel):
+    mushaf: Literal["v1", "v2", "v4"] | None = None
+    theme: Literal["light", "dark"] | None = None
+    font_scale: float | None = Field(default=None, ge=0.5, le=2.5)
+
+
 class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -30,6 +42,7 @@ class UserOut(BaseModel):
     display_name: str | None
     email_verified: bool
     has_google: bool = False
+    preferences: Preferences
 
 
 class AuthResponse(BaseModel):
