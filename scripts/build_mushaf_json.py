@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
-"""Convert the QPC V4 mushaf CSVs into compact per-page JSON for the frontend.
+"""Convert the QPC mushaf CSVs into compact per-edition page JSON for the frontend.
 
-Reads:
-    scripts/words.csv        id,location,surah,ayah,word,text
-    scripts/page_lines.csv   page_number,line_number,line_type,is_centered,first_word_id,last_word_id,surah_number
-    scripts/qpc_mapping.csv  word_id,page_number,code
+Reads (per edition):
+    scripts/words.csv            id,location,surah,ayah,word,text   (shared)
+    scripts/page_lines*.csv      page_number,line_number,line_type,is_centered,first_word_id,last_word_id,surah_number
+    scripts/qpc_mapping*.csv     word_id,page_number,code
 
-Writes:
-    frontend/public/mushaf/index.json
-    frontend/public/mushaf/pages/<n>.json   (604 files)
-    backend/app/data/words_meta.json        (word id -> [surah, ayah, word, location])
+Writes (per edition):
+    frontend/public/mushaf/{edition}/index.json
+    frontend/public/mushaf/{edition}/pages/<n>.json
+    backend/app/data/words_meta.json   (single shared file: word id -> [surah, ayah, word, location])
+
+Editions: v1 (1405H), v2 (1421H), v4 (1441H). They share words.csv and the
+contiguous 1..83668 word-id space, but differ in per-page fonts, glyph
+codepoints, and (for v1, and slightly for v2 vs v4) page/line layout.
 
 Run from the repo root:  python scripts/build_mushaf_json.py
 """
@@ -22,8 +26,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "scripts"
 OUT_DIR = ROOT / "frontend" / "public" / "mushaf"
-PAGES_DIR = OUT_DIR / "pages"
 BACKEND_DATA_DIR = ROOT / "backend" / "app" / "data"
+
+# edition -> (page-lines CSV, glyph-mapping CSV). v4 keeps the original files.
+EDITIONS: dict[str, dict[str, str]] = {
+    "v1": {"pages": "page_lines_v1.csv", "mapping": "qpc_mapping_v1.csv"},
+    "v2": {"pages": "page_lines_v2.csv", "mapping": "qpc_mapping_v2.csv"},
+    "v4": {"pages": "page_lines.csv", "mapping": "qpc_mapping.csv"},
+}
 
 SURAH_NAMES = {
     1: "الفاتحة", 2: "البقرة", 3: "آل عمران", 4: "النساء", 5: "المائدة", 6: "الأنعام",
@@ -72,9 +82,9 @@ def read_words() -> dict[int, dict]:
     return words
 
 
-def read_mapping() -> dict[int, dict]:
+def read_mapping(filename: str) -> dict[int, dict]:
     mapping: dict[int, dict] = {}
-    with open(SRC / "qpc_mapping.csv", encoding="utf-8", newline="") as f:
+    with open(SRC / filename, encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
             wid = int(row["word_id"])
             codes = [int(c) for c in row["code"].split()] if row["code"].strip() else []
@@ -82,9 +92,9 @@ def read_mapping() -> dict[int, dict]:
     return mapping
 
 
-def read_lines() -> dict[int, list[dict]]:
+def read_lines(filename: str) -> dict[int, list[dict]]:
     pages: dict[int, list[dict]] = {}
-    with open(SRC / "page_lines.csv", encoding="utf-8", newline="") as f:
+    with open(SRC / filename, encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
             pn = int(row["page_number"])
             pages.setdefault(pn, []).append(
@@ -99,24 +109,7 @@ def read_lines() -> dict[int, list[dict]]:
     return pages
 
 
-def main() -> None:
-    words = read_words()
-    mapping = read_mapping()
-    pages = read_lines()
-
-    PAGES_DIR.mkdir(parents=True, exist_ok=True)
-    BACKEND_DATA_DIR.mkdir(parents=True, exist_ok=True)
-
-    # word metadata for the backend (authoritative source for location data)
-    words_meta = {
-        str(wid): [w["s"], w["a"], w["n"], w["loc"]]
-        for wid, w in words.items()
-    }
-    (BACKEND_DATA_DIR / "words_meta.json").write_text(
-        json.dumps(words_meta, ensure_ascii=False), encoding="utf-8"
-    )
-
-    # surah -> first page it appears on
+def build_index(words: dict[int, dict], mapping: dict[int, dict]) -> dict:
     surah_start_page: dict[int, int] = {}
     for wid, m in mapping.items():
         w = words.get(wid)
@@ -127,7 +120,6 @@ def main() -> None:
         if s not in surah_start_page or p < surah_start_page[s]:
             surah_start_page[s] = p
 
-    # juz -> start page
     juz_start_page: dict[int, int] = {}
     for j, (s, a) in JUZ_STARTS.items():
         start = None
@@ -137,62 +129,89 @@ def main() -> None:
                 break
         juz_start_page[j] = start if start is not None else 1
 
-    index = {
+    return {
         "numPages": 604,
         "surahNames": SURAH_NAMES,
         "surahStartPage": {str(k): v for k, v in surah_start_page.items()},
         "juzStartPage": {str(k): v for k, v in juz_start_page.items()},
     }
-    (OUT_DIR / "index.json").write_text(json.dumps(index, ensure_ascii=False), encoding="utf-8")
 
-    for page in sorted(pages):
-        doc = {"page": page, "lines": []}
-        for line in pages[page]:
-            entry = {"type": line["type"], "centered": line["centered"]}
-            if line["type"] == "surah_name":
-                entry["surah"] = line["surah"]
-            elif line["type"] == "ayah":
-                wlist = []
-                for wid in range(line["first"], line["last"] + 1):
-                    w = words.get(wid)
-                    if not w:
-                        continue
-                    m = mapping.get(wid, {"page": page, "codes": []})
-                    wlist.append(
-                        {
-                            "id": wid,
-                            "s": w["s"],
-                            "a": w["a"],
-                            "n": w["n"],
-                            "loc": w["loc"],
-                            "text": w["text"],
-                            "codes": m["codes"],
-                        }
-                    )
-                entry["words"] = wlist
-            doc["lines"].append(entry)
 
-        # first surah present on the page (used for navigation label)
-        surah = None
-        for line in doc["lines"]:
-            if line["type"] == "ayah" and line.get("words"):
-                surah = line["words"][0]["s"]
-                break
-        doc["surah"] = surah
+def main() -> None:
+    words = read_words()
+    BACKEND_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-        (PAGES_DIR / f"{page}.json").write_text(
-            json.dumps(doc, ensure_ascii=False), encoding="utf-8"
+    # word metadata for the backend (authoritative, edition-independent)
+    words_meta = {
+        str(wid): [w["s"], w["a"], w["n"], w["loc"]]
+        for wid, w in words.items()
+    }
+    (BACKEND_DATA_DIR / "words_meta.json").write_text(
+        json.dumps(words_meta, ensure_ascii=False), encoding="utf-8"
+    )
+
+    for edition, files in EDITIONS.items():
+        mapping = read_mapping(files["mapping"])
+        pages = read_lines(files["pages"])
+
+        edition_dir = OUT_DIR / edition
+        pages_dir = edition_dir / "pages"
+        pages_dir.mkdir(parents=True, exist_ok=True)
+
+        index = build_index(words, mapping)
+        (edition_dir / "index.json").write_text(
+            json.dumps(index, ensure_ascii=False), encoding="utf-8"
         )
 
-    total_words = sum(
-        1
-        for page in pages
-        for line in pages[page]
-        if line["type"] == "ayah"
-        for _ in range(line["first"] or 0, (line["last"] or 0) + 1)
-    )
-    print(f"Wrote {len(pages)} page files, index.json, ~{total_words} words, "
-          f"{len(surah_start_page)} surahs, {len(juz_start_page)} juz.")
+        for page in sorted(pages):
+            doc = {"page": page, "lines": []}
+            for line in pages[page]:
+                entry = {"type": line["type"], "centered": line["centered"]}
+                if line["type"] == "surah_name":
+                    entry["surah"] = line["surah"]
+                elif line["type"] == "ayah":
+                    wlist = []
+                    for wid in range(line["first"], line["last"] + 1):
+                        w = words.get(wid)
+                        if not w:
+                            continue
+                        m = mapping.get(wid, {"page": page, "codes": []})
+                        wlist.append(
+                            {
+                                "id": wid,
+                                "s": w["s"],
+                                "a": w["a"],
+                                "n": w["n"],
+                                "loc": w["loc"],
+                                "text": w["text"],
+                                "codes": m["codes"],
+                            }
+                        )
+                    entry["words"] = wlist
+                doc["lines"].append(entry)
+
+            # first surah present on the page (used for navigation label)
+            surah = None
+            for line in doc["lines"]:
+                if line["type"] == "ayah" and line.get("words"):
+                    surah = line["words"][0]["s"]
+                    break
+            doc["surah"] = surah
+
+            (pages_dir / f"{page}.json").write_text(
+                json.dumps(doc, ensure_ascii=False), encoding="utf-8"
+            )
+
+        total_words = sum(
+            1
+            for page in pages
+            for line in pages[page]
+            if line["type"] == "ayah"
+            for _ in range(line["first"] or 0, (line["last"] or 0) + 1)
+        )
+        print(f"[{edition}] wrote {len(pages)} pages, index.json, ~{total_words} words")
+
+    print("wrote words_meta.json")
 
 
 if __name__ == "__main__":
