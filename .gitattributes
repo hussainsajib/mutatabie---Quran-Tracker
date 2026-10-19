@@ -1,0 +1,11 @@
+# Normalize text files to LF for cross-platform consistency (Docker/Linux build).
+* text=auto eol=lf
+
+# Binary assets — never normalize line endings or attempt text diffs.
+*.woff2 binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

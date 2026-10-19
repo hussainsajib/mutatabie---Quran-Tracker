@@ -1,0 +1,45 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - -t
+      - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:${SHORT_SHA}"
+      - -t
+      - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:latest"
+      - .
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - push
+      - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:${SHORT_SHA}"
+  - name: "gcr.io/cloud-builders/gcloud"
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud run deploy ${_SERVICE_NAME} \
+          --image ${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:${SHORT_SHA} \
+          --region ${_REGION} \
+          --platform managed \
+          --allow-unauthenticated \
+          --set-secrets=SECRET_KEY=${_SECRET_KEY_SECRET}:latest,DATABASE_URL=${_DATABASE_URL_SECRET}:latest \
+          --set-env-vars=ENVIRONMENT=production,COOKIE_SECURE=true,FRONTEND_ORIGIN=${_FRONTEND_ORIGIN},GOOGLE_CLIENT_ID=${_GOOGLE_CLIENT_ID},GOOGLE_CLIENT_SECRET=${_GOOGLE_CLIENT_SECRET},GOOGLE_REDIRECT_URI=${_FRONTEND_ORIGIN}/api/auth/google/callback \
+          --memory 512Mi \
+          --cpu 1 \
+          --max-instances 10
+
+images:
+  - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:${SHORT_SHA}"
+
+substitutions:
+  _SERVICE_NAME: quran-tracker
+  _REGION: us-central1
+  _ARTIFACT_REGISTRY: us-central1-docker.pkg.dev
+  # Set these as Cloud Build triggers substitutions or Secret Manager secrets.
+  _SECRET_KEY_SECRET: quran-secret-key
+  _DATABASE_URL_SECRET: quran-database-url
+  _FRONTEND_ORIGIN: https://YOUR-SERVICE-URL.a.run.app
+  _GOOGLE_CLIENT_ID: ""
+  _GOOGLE_CLIENT_SECRET: ""
+
+options:
+  logging: CLOUD_LOGGING_ONLY

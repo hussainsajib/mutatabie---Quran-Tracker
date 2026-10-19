@@ -1,0 +1,41 @@
+import { apiFetch } from "./client";
+
+export interface User {
+  id: string;
+  email: string;
+  display_name: string | null;
+  email_verified: boolean;
+  has_google: boolean;
+}
+
+export async function bootstrapCsrf(): Promise<void> {
+  await apiFetch<{ ok: boolean }>("/api/auth/csrf");
+}
+
+export async function getMe(): Promise<User> {
+  return apiFetch<User>("/api/auth/me");
+}
+
+export async function login(email: string, password: string): Promise<User> {
+  const res = await apiFetch<{ user: User }>("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+  return res.user;
+}
+
+export async function signup(
+  email: string,
+  password: string,
+  displayName?: string,
+): Promise<User> {
+  const res = await apiFetch<{ user: User }>("/api/auth/signup", {
+    method: "POST",
+    body: JSON.stringify({ email, password, display_name: displayName || null }),
+  });
+  return res.user;
+}
+
+export async function logout(): Promise<void> {
+  await apiFetch<{ message: string }>("/api/auth/logout", { method: "POST" });
+}
