@@ -41,7 +41,7 @@ export function buildTheme(mode: Mode) {
             borderColor: border,
             backgroundColor: surface2,
             color: ink,
-            fontSize: "0.65rem",
+            fontSize: "var(--ctl-fs)",
             textTransform: "none",
             "&.Mui-selected": {
               backgroundColor: accentSoft,
@@ -57,11 +57,11 @@ export function buildTheme(mode: Mode) {
         styleOverrides: {
           root: {
             "& .MuiOutlinedInput-root": {
-              height: 30,
-              minHeight: 30,
+              height: "var(--ctl-h)",
+              minHeight: "var(--ctl-h)",
               paddingTop: 0,
               paddingBottom: 0,
-              fontSize: "0.65rem",
+              fontSize: "var(--ctl-fs)",
               color: ink,
               backgroundColor: surface2,
               "& .MuiOutlinedInput-input": {
@@ -88,7 +88,7 @@ export function buildTheme(mode: Mode) {
           listbox: {
             padding: 4,
             "& .MuiAutocomplete-option": {
-              fontSize: "0.65rem",
+              fontSize: "var(--ctl-fs)",
               minHeight: 32,
               borderRadius: 6,
               "&.Mui-focused": {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { loadPage, fontsForPage, injectFontFace } from "../mushaf/loader";
 import type { Line, MistakeType, MushafEdition, Word } from "../mushaf/types";
@@ -6,6 +6,8 @@ import surahHeaderFrame from "../assets/surah-header-frame.svg?raw";
 
 const SURAH_WORD = 0xe000; // calligraphic "سُورَةُ" prefix glyph (the word "surah")
 const BASMALLAH = 0xf8dd; // basmallah glyph in QCF4_Hafs_01
+const MAX_DESKTOP_SCALE = 1.5; // upper bound for growing the page on wide screens
+const FONT_TIMEOUT_MS = 8000; // show the page anyway if a font is this slow
 const MAX_GAP = 1.0; // max per-gap stretch (em) before flushing a short line
 
 interface Props {
@@ -26,9 +28,30 @@ export function MushafPage({ edition, page, fontScale, marksByWord, onWordClick 
   const pageRef = useRef<HTMLDivElement>(null);
   const baseSizeRef = useRef<number | null>(null);
 
+  // Page fonts are glyph fonts: until one loads, the browser draws the raw
+  // private-use codepoints in a fallback font. Keep the page hidden (spinner)
+  // until every font it needs is ready, so only the real mushaf text shows.
+  const pageKey = `${edition}:${page}`;
+  const [readyKey, setReadyKey] = useState<string | null>(null);
+  const fontsReady = readyKey === pageKey;
+
   useEffect(() => {
-    if (data) fontsForPage(edition, data).forEach(injectFontFace);
-  }, [edition, data]);
+    if (!data) return;
+    let cancelled = false;
+    const families = fontsForPage(edition, data);
+    families.forEach(injectFontFace);
+    const markReady = () => {
+      if (!cancelled) setReadyKey(pageKey);
+    };
+    const timeout = window.setTimeout(markReady, FONT_TIMEOUT_MS); // don't spin forever
+    Promise.all(families.map((f) => document.fonts.load(`1em '${f}'`)))
+      .catch(() => undefined)
+      .then(markReady);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
+  }, [edition, data, pageKey]);
 
   const fit = useCallback(() => {
     const pageEl = pageRef.current;
@@ -45,18 +68,19 @@ export function MushafPage({ edition, page, fontScale, marksByWord, onWordClick 
     const avail = frameEl.clientWidth - 16; // pad for sub-pixel rounding
     if (natural && avail > 0) {
       const ratio = avail / natural;
-      // On small screens the text should fill the width snugly, so allow the
-      // page to scale up (not just shrink) to reach the available width. On
-      // larger screens keep the shrink-to-fit behavior so desktop stays put.
+      // Small screens fill the width snugly (scale up or down). Tablets and
+      // desktops grow the page too, but only up to MAX_DESKTOP_SCALE so the
+      // text stays readable without becoming oversized on wide monitors.
       const scale = window.matchMedia("(max-width: 640px)").matches
         ? ratio
-        : Math.min(1, ratio);
+        : Math.min(MAX_DESKTOP_SCALE, ratio);
       pageEl.style.fontSize = `${baseSize * fontScale * scale}px`;
     }
 
     const fontSize = parseFloat(pageEl.style.fontSize) || baseSize;
     const maxGap = MAX_GAP * fontSize;
     const pageW = pageEl.offsetWidth;
+    pageEl.style.setProperty("--page-w", `${pageW}px`);
 
     pageEl
       .querySelectorAll<HTMLElement>(".quran-line:not(.is-centered)")
@@ -76,11 +100,11 @@ export function MushafPage({ edition, page, fontScale, marksByWord, onWordClick 
     fit();
     window.addEventListener("resize", fit);
     return () => window.removeEventListener("resize", fit);
-  }, [fit, data]);
+  }, [fit, data, fontsReady]);
 
   // Re-fit once the page font has actually loaded (font-display: swap lies about metrics).
   useEffect(() => {
-    if (!data) return;
+    if (!data || !fontsReady) return;
     let cancelled = false;
     document.fonts.ready.then(() => {
       if (!cancelled) fit();
@@ -88,9 +112,9 @@ export function MushafPage({ edition, page, fontScale, marksByWord, onWordClick 
     return () => {
       cancelled = true;
     };
-  }, [data, fit]);
+  }, [data, fit, fontsReady]);
 
-  if (isLoading) return <div className="mushaf-loading">Loading page…</div>;
+  if (isLoading || (data && !fontsReady)) return <div className="mushaf-loading"><span className="spinner" role="status" aria-label="Loading page" /></div>;
   if (error || !data) return <div className="mushaf-error">Could not load this page.</div>;
 
   return (
