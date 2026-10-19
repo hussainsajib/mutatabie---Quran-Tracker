@@ -3,21 +3,21 @@ steps:
     args:
       - build
       - -t
-      - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:${SHORT_SHA}"
+      - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${SHORT_SHA}"
       - -t
-      - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:latest"
+      - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:latest"
       - .
   - name: "gcr.io/cloud-builders/docker"
     args:
       - push
-      - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:${SHORT_SHA}"
+      - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${SHORT_SHA}"
   - name: "gcr.io/cloud-builders/gcloud"
     entrypoint: bash
     args:
       - -c
       - |
         gcloud run deploy ${_SERVICE_NAME} \
-          --image ${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:${SHORT_SHA} \
+          --image ${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${SHORT_SHA} \
           --region ${_REGION} \
           --platform managed \
           --allow-unauthenticated \
@@ -28,12 +28,13 @@ steps:
           --max-instances 10
 
 images:
-  - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_SERVICE_NAME}:${SHORT_SHA}"
+  - "${_ARTIFACT_REGISTRY}/${PROJECT_ID}/${_REPO_NAME}/${_SERVICE_NAME}:${SHORT_SHA}"
 
 substitutions:
   _SERVICE_NAME: quran-tracker
   _REGION: us-central1
   _ARTIFACT_REGISTRY: us-central1-docker.pkg.dev
+  _REPO_NAME: quran
   # Set these as Cloud Build triggers substitutions or Secret Manager secrets.
   _SECRET_KEY_SECRET: quran-secret-key
   _DATABASE_URL_SECRET: quran-database-url
