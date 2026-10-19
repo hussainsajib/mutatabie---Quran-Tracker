@@ -7,16 +7,21 @@ commercialising any part of this bundle.**
 
 ## Fonts
 
-The fonts in this bundle originate from the **QCF V4 (Quran Calligraphic Font
-v4)** release published by the **King Fahd Complex for the Printing of the Holy
+The fonts in this bundle originate from the **QCF (Quran Calligraphic Font)**
+releases published by the **King Fahd Complex for the Printing of the Holy
 Quran (KFQPC)** — see <https://qurancomplex.gov.sa>. The files are the exact
-woff2 files distributed with that release:
+woff2 files distributed with those releases:
 
 | File(s) | Description |
 |---|---|
 | `fonts/qpcv4/p1.woff2` … `p604.woff2` | QPC V4 Tajweed page fonts (one per mushaf page) |
-| `fonts/surah-name-v4.woff2` | QPC V4 surah header font |
+| `fonts/qpcv2/p1.woff2` … `p604.woff2` | QPC V2 (1421H) page fonts |
+| `fonts/qpcv1/p1.woff2` … `p604.woff2` | QPC V1 (1405H) page fonts |
+| `fonts/surah-name-v4.woff2` | QPC surah header font (used for all editions) |
 | `fonts/QCF4_Hafs_01_W.woff2` | QCF v4 Hafs word-group font (included only for the basmallah glyph) |
+
+The V4 fonts ship with the `qpc-v4-mushaf-bundle`; the V1/V2 page fonts are
+retrieved from quran.com's public font CDN (`fonts.quran.com`).
 
 The QPC fonts are copyright works of KFQPC. Their terms of use may restrict
 redistribution, modification, or commercial use. Verify the current license on

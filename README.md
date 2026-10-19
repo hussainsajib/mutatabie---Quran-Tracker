@@ -10,8 +10,11 @@ ready for **Google Cloud Run**.
 
 ## Features
 
-- **Authentic mushaf rendering** — real printed calligraphy via the QPC V4
+- **Authentic mushaf rendering** — real printed calligraphy via the QPC
   per-page fonts (604 pages, exact line breaks, no Unicode approximation).
+- **Three mushaf editions** — Madinah V1 (1405H), V2 (1421H), and V4 Tajweed
+  (1441H), selectable per user from Settings. Marks are keyed to the word, so
+  they carry across editions automatically.
 - **Word-level marking** — tap any word to record a **hifdh** or **tajweed**
   mistake, with an optional note and an automatic **repeat counter**.
 - **Private by design** — every mark is scoped to its owner; other users can
@@ -199,23 +202,39 @@ DDoS protection.
 | `GET`  | `/api/marks/summary` | ✓ | counts by type |
 | `PUT`  | `/api/marks/{word_id}` | ✓ | record a mistake (upsert, +1 repeat) |
 | `DELETE` | `/api/marks/{word_id}` | ✓ | remove a mark |
+| `PUT`  | `/api/preferences` | ✓ | update mushaf edition / theme / font scale |
 | `GET`  | `/api/health` | — | liveness |
 
 ## Attribution
 
-The mushaf fonts and word→glyph mapping are derived from
+The V4 mushaf fonts and word→glyph mapping are derived from
 [`hussainsajib/qpc-v4-mushaf-bundle`](https://github.com/hussainsajib/qpc-v4-mushaf-bundle),
 which in turn reuses the **QPC V4 Tajweed page fonts** (QUL / TarteelAI) and the
-King Fahd Complex's **QCF v4** font (for the basmallah glyph only). See
+King Fahd Complex's **QCF v4** font (for the basmallah glyph only). The V1/V2
+page fonts and glyph mappings are sourced from
+[quran.com](https://quran.com) (fonts.quran.com CDN and the public API v4), which
+distribute the corresponding King Fahd Complex QCF fonts. See
 `LICENSE-NOTICE.md` for copyright and redistribution terms before redistributing.
 
 ## Regenerating the mushaf data
 
-If you replace the fonts or want to rebuild the page JSON:
+The mushaf data ships as committed CSVs and per-edition page JSONs. To rebuild
+or add an edition:
 
 ```bash
+# 1. (re)download the V1/V2 glyph mappings + layouts from the quran.com API
+python scripts/fetch_mushaf_data.py
+
+# 2. (re)download the V1/V2 page fonts from the quran.com CDN
+python scripts/fetch_mushaf_fonts.py
+
+# 3. regenerate per-edition page JSON + words_meta.json from the CSVs
 python scripts/build_mushaf_json.py
 ```
 
-This regenerates `frontend/public/mushaf/*` and `backend/app/data/words_meta.json`
-from `scripts/*.csv` (which were extracted from the bundle).
+`build_mushaf_json.py` reads `scripts/words.csv` (shared), `page_lines*.csv`,
+and `qpc_mapping*.csv` (per edition) and writes
+`frontend/public/mushaf/{v1,v2,v4}/**` plus
+`backend/app/data/words_meta.json` (shared). V4 keeps the original
+`page_lines.csv` / `qpc_mapping.csv` files; V1 and V2 use the `_v1` / `_v2`
+variants.
