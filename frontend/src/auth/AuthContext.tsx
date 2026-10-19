@@ -22,6 +22,7 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, displayName?: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -48,6 +49,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Apply the signed-in user's theme to the document as soon as it loads.
+  useEffect(() => {
+    document.documentElement.classList.toggle(
+      "dark",
+      user?.preferences?.theme === "dark",
+    );
+  }, [user?.preferences?.theme]);
+
   const login = useCallback(async (email: string, password: string) => {
     const u = await apiLogin(email, password);
     setUser(u);
@@ -69,9 +78,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const updateUser = useCallback((u: User) => setUser(u), []);
+
   const value = useMemo(
-    () => ({ user, loading, login, signup, logout }),
-    [user, loading, login, signup, logout],
+    () => ({ user, loading, login, signup, logout, updateUser }),
+    [user, loading, login, signup, logout, updateUser],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

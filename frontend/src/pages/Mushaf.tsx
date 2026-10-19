@@ -18,19 +18,16 @@ export function Mushaf() {
     Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1),
   );
   const [page, setPage] = useState(initialPage);
-  const [fontScale, setFontScale] = useState(1);
-  const [theme, setTheme] = useState<"light" | "dark">(() =>
-    localStorage.getItem("theme") === "dark" ? "dark" : "light",
-  );
   const [selectedWord, setSelectedWord] = useState<Word | null>(null);
 
-  const indexQuery = useQuery({ queryKey: ["index"], queryFn: loadIndex });
-  const marksQuery = useQuery({ queryKey: ["marks"], queryFn: listMarks });
+  const edition = user?.preferences?.mushaf ?? "v4";
+  const fontScale = user?.preferences?.font_scale ?? 1;
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+  const indexQuery = useQuery({
+    queryKey: ["index", edition],
+    queryFn: () => loadIndex(edition),
+  });
+  const marksQuery = useQuery({ queryKey: ["marks"], queryFn: listMarks });
 
   function goto(p: number) {
     const clamped = Math.min(604, Math.max(1, p));
@@ -78,17 +75,13 @@ export function Mushaf() {
 
   return (
     <div className="app-shell">
-      {indexQuery.data ? (
+      {indexQuery.data && user ? (
         <Toolbar
           page={page}
           index={indexQuery.data}
-          fontScale={fontScale}
-          theme={theme}
           marksCount={marks.length}
-          user={user!}
+          user={user}
           onPageChange={goto}
-          onFontScaleChange={setFontScale}
-          onToggleTheme={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
           onLogout={logout}
         />
       ) : null}
@@ -100,6 +93,7 @@ export function Mushaf() {
           <div className="mushaf-error">Could not load the mushaf data.</div>
         ) : (
           <MushafPage
+            edition={edition}
             page={page}
             fontScale={fontScale}
             marksByWord={marksByWord}

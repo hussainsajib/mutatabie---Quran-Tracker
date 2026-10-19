@@ -1,23 +1,24 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { loadPage, fontsForPage, injectFontFace } from "../mushaf/loader";
-import type { Line, MistakeType, Word } from "../mushaf/types";
+import type { Line, MistakeType, MushafEdition, Word } from "../mushaf/types";
 
 const ORNAMENT = 0xe000; // surah header leading ornament
 const BASMALLAH = 0xf8dd; // basmallah glyph in QCF4_Hafs_01
 const MAX_GAP = 1.0; // max per-gap stretch (em) before flushing a short line
 
 interface Props {
+  edition: MushafEdition;
   page: number;
   fontScale: number;
   marksByWord: Map<number, Set<MistakeType>>;
   onWordClick: (word: Word) => void;
 }
 
-export function MushafPage({ page, fontScale, marksByWord, onWordClick }: Props) {
+export function MushafPage({ edition, page, fontScale, marksByWord, onWordClick }: Props) {
   const { data, isLoading, error } = useQuery({
-    queryKey: ["page", page],
-    queryFn: () => loadPage(page),
+    queryKey: ["page", edition, page],
+    queryFn: () => loadPage(edition, page),
   });
 
   const frameRef = useRef<HTMLDivElement>(null);
@@ -25,8 +26,8 @@ export function MushafPage({ page, fontScale, marksByWord, onWordClick }: Props)
   const baseSizeRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (data) fontsForPage(data).forEach(injectFontFace);
-  }, [data]);
+    if (data) fontsForPage(edition, data).forEach(injectFontFace);
+  }, [edition, data]);
 
   const fit = useCallback(() => {
     const pageEl = pageRef.current;
@@ -93,6 +94,7 @@ export function MushafPage({ page, fontScale, marksByWord, onWordClick }: Props)
               key={`${page}-${i}`}
               line={line}
               page={page}
+              edition={edition}
               marksByWord={marksByWord}
               onWordClick={onWordClick}
             />
@@ -106,11 +108,13 @@ export function MushafPage({ page, fontScale, marksByWord, onWordClick }: Props)
 function LineView({
   line,
   page,
+  edition,
   marksByWord,
   onWordClick,
 }: {
   line: Line;
   page: number;
+  edition: MushafEdition;
   marksByWord: Map<number, Set<MistakeType>>;
   onWordClick: (word: Word) => void;
 }) {
@@ -142,6 +146,7 @@ function LineView({
           key={word.id}
           word={word}
           page={page}
+          edition={edition}
           types={marksByWord.get(word.id)}
           onWordClick={onWordClick}
         />
@@ -153,11 +158,13 @@ function LineView({
 function WordSpan({
   word,
   page,
+  edition,
   types,
   onWordClick,
 }: {
   word: Word;
   page: number;
+  edition: MushafEdition;
   types: Set<MistakeType> | undefined;
   onWordClick: (word: Word) => void;
 }) {
@@ -168,7 +175,7 @@ function WordSpan({
   if (types?.has("hifdh")) cls.push("marked-hifdh");
   if (types?.has("tajweed")) cls.push("marked-tajweed");
 
-  const style = word.codes.length ? { fontFamily: `'p${page}'` } : undefined;
+  const style = word.codes.length ? { fontFamily: `'${edition}-p${page}'` } : undefined;
   const content = word.codes.length
     ? word.codes.map((c) => String.fromCodePoint(c)).join("")
     : word.text;

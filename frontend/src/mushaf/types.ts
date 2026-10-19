@@ -32,6 +32,8 @@ export interface MushafIndex {
 
 export type MistakeType = "hifdh" | "tajweed";
 
+export type MushafEdition = "v1" | "v2" | "v4";
+
 export interface Mark {
   id: string;
   word_id: number;

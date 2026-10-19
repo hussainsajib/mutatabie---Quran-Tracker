@@ -648,3 +648,152 @@ button {
     padding: 12px 10px;
   }
 }
+
+/* ─────────────────────────── Settings ─────────────────────────── */
+.settings-shell {
+  min-height: 100vh;
+  padding: 32px 20px 48px;
+  background: var(--bg);
+}
+
+.settings-card {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.settings-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.settings-back {
+  font-size: 0.85rem;
+  color: var(--accent-dark);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.settings-back:hover {
+  text-decoration: underline;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-section h2 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.settings-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  line-height: 1.45;
+}
+
+.mushaf-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mushaf-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: start;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink);
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+
+.mushaf-option.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.mushaf-option-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.mushaf-option-desc {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.segmented {
+  display: flex;
+  gap: 6px;
+}
+
+.segment {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.segment.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
+.scale-control {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.scale-control input[type="range"] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.scale-value {
+  min-width: 44px;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--accent-dark);
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+}

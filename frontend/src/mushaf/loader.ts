@@ -1,24 +1,26 @@
-import type { MushafIndex, PageData } from "./types";
+import type { MushafEdition, MushafIndex, PageData } from "./types";
 
-let cachedIndex: MushafIndex | null = null;
+const indexCache: Partial<Record<MushafEdition, MushafIndex>> = {};
 
-export async function loadIndex(): Promise<MushafIndex> {
-  if (cachedIndex) return cachedIndex;
-  const res = await fetch("/mushaf/index.json");
+export async function loadIndex(edition: MushafEdition): Promise<MushafIndex> {
+  const cached = indexCache[edition];
+  if (cached) return cached;
+  const res = await fetch(`/mushaf/${edition}/index.json`);
   if (!res.ok) throw new Error(`Failed to load mushaf index: HTTP ${res.status}`);
-  cachedIndex = (await res.json()) as MushafIndex;
-  return cachedIndex;
+  const index = (await res.json()) as MushafIndex;
+  indexCache[edition] = index;
+  return index;
 }
 
-export async function loadPage(page: number): Promise<PageData> {
-  const res = await fetch(`/mushaf/pages/${page}.json`);
+export async function loadPage(edition: MushafEdition, page: number): Promise<PageData> {
+  const res = await fetch(`/mushaf/${edition}/pages/${page}.json`);
   if (!res.ok) throw new Error(`Failed to load page ${page}: HTTP ${res.status}`);
   return (await res.json()) as PageData;
 }
 
-/** Font families required to render a page. */
-export function fontsForPage(data: PageData): string[] {
-  const fams = [`p${data.page}`];
+/** Font families required to render a page of the given edition. */
+export function fontsForPage(edition: MushafEdition, data: PageData): string[] {
+  const fams = [`${edition}-p${data.page}`];
   for (const line of data.lines) {
     if (line.type === "surah_name") fams.push("surah-name-v4");
     if (line.type === "basmallah") fams.push("QCF4_Hafs_01");
@@ -33,9 +35,11 @@ export function injectFontFace(name: string): void {
   if (injected.has(name)) return;
   injected.add(name);
 
+  // Page fonts are namespaced by edition: "v1-p42" -> /fonts/qpcv1/p42.woff2.
   // The basmalah font file carries a `_W` suffix on disk, unlike its family name.
-  const url = /^p\d+$/.test(name)
-    ? `/fonts/qpcv4/${name}.woff2`
+  const pageMatch = /^(v[124])-p(\d+)$/.exec(name);
+  const url = pageMatch
+    ? `/fonts/qpc${pageMatch[1]}/p${pageMatch[2]}.woff2`
     : name === "QCF4_Hafs_01"
       ? `/fonts/QCF4_Hafs_01_W.woff2`
       : `/fonts/${name}.woff2`;
