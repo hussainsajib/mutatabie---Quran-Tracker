@@ -11,7 +11,7 @@ export function Signup() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to="/mushaf" replace />;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

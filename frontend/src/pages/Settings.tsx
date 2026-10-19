@@ -185,7 +185,7 @@ export function Settings() {
     mutationFn: () => updatePreferences({ mushaf, theme, font_scale: fontScale }),
     onSuccess: (updated) => {
       updateUser(updated);
-      navigate("/");
+      navigate("/mushaf");
     },
     onError: (err) => setError(err instanceof Error ? err.message : "Failed to save"),
   });
@@ -207,7 +207,7 @@ export function Settings() {
     if (!index || session.marks.length === 0) return;
     const first = session.marks[0];
     const page = pageForMark(first.surah, first.ayah, index);
-    navigate(`/?page=${page}&session_from=${session.from}&session_to=${session.to}`);
+    navigate(`/mushaf?page=${page}&session_from=${session.from}&session_to=${session.to}`);
   }
 
   function toggleExpand(key: number) {
@@ -219,7 +219,7 @@ export function Settings() {
       <div className="settings-card">
         <div className="settings-header">
           <h1>Settings</h1>
-          <Link className="settings-back" to="/">
+          <Link className="settings-back" to="/mushaf">
             ← Back to Mushaf
           </Link>
         </div>

@@ -26,7 +26,7 @@ export function Login() {
 
   const oauthError = searchParams.get("error");
 
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to="/mushaf" replace />;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

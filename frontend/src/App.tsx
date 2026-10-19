@@ -6,6 +6,7 @@ import { useAuth } from "./auth/AuthContext";
 import { buildTheme } from "./theme";
 import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
+import { Landing } from "./pages/Landing";
 import { Mushaf } from "./pages/Mushaf";
 import { Settings } from "./pages/Settings";
 
@@ -21,8 +22,9 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<Landing />} />
         <Route
-          path="/"
+          path="/mushaf"
           element={
             <ProtectedRoute>
               <Mushaf />
