@@ -27,6 +27,28 @@ The QPC fonts are copyright works of KFQPC. Their terms of use may restrict
 redistribution, modification, or commercial use. Verify the current license on
 the KFQPC site before publishing this bundle publicly.
 
+## Surah header artwork
+
+The decorative surah header frame at
+`frontend/src/assets/surah-header-frame.svg` is the **printed Madinah mushaf's
+color-coded surah-header ornament** (the tajweed color scheme). It is the
+authentic artwork published by the King Fahd Complex for the Printing of the
+Holy Quran (KFQPC).
+
+> **Copyright**: this ornament design belongs to its publisher (KFQPC). It is
+> fine for private, non-commercial use (such as this self-hosted app), but a
+> commercial or publicly redistributed product would need a separate license
+> from KFQPC. This is not legal advice.
+
+Other, unused frames kept for reference:
+
+- `frontend/src/assets/surah-header-original.svg` — an original ornamental
+  drawing (no third-party copyright), recolourable via `currentColor`.
+- `frontend/src/assets/surah-header-mono.svg` — the recolourable `mono.svg`
+  from [`quran-ws/quran-assets`](https://github.com/quran-ws/quran-assets)
+  (`assets/surah-headers/mushaf-hafs-madinah-mumtaza/`), licensed
+  **CC BY-NC-SA 4.0** (*provisional*, KFQPC).
+
 ## Metadata
 
 The CSV files under `data/` are generated artifacts:

@@ -3,14 +3,14 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: quran_tracker
-      POSTGRES_PASSWORD: "Bismillah@6204"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}"
       POSTGRES_DB: quran_tracker
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U quran -d quran"]
+      test: ["CMD-SHELL", "pg_isready -U quran_tracker -d quran_tracker"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -22,8 +22,8 @@ services:
         condition: service_healthy
     environment:
       ENVIRONMENT: development
-      SECRET_KEY: dev-secret-key-change-me-in-production
-      DATABASE_URL: postgresql+asyncpg://quran_tracker:Bismillah%406204@db:5432/quran_tracker
+      SECRET_KEY: "${SECRET_KEY:?set SECRET_KEY in .env}"
+      DATABASE_URL: "postgresql+asyncpg://quran_tracker:${POSTGRES_PASSWORD_ENCODED:?set POSTGRES_PASSWORD_ENCODED in .env}@db:5432/quran_tracker"
       COOKIE_SECURE: "false"
       FRONTEND_ORIGIN: http://localhost:8080
       GOOGLE_REDIRECT_URI: http://localhost:8080/api/auth/google/callback

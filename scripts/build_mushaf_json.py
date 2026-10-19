@@ -111,28 +111,39 @@ def read_lines(filename: str) -> dict[int, list[dict]]:
 
 def build_index(words: dict[int, dict], mapping: dict[int, dict]) -> dict:
     surah_start_page: dict[int, int] = {}
+    ayah_start_page: dict[str, int] = {}
     for wid, m in mapping.items():
         w = words.get(wid)
         if not w:
             continue
         s = w["s"]
+        a = w["a"]
         p = m["page"]
         if s not in surah_start_page or p < surah_start_page[s]:
             surah_start_page[s] = p
+        key = f"{s}:{a}"
+        if key not in ayah_start_page or p < ayah_start_page[key]:
+            ayah_start_page[key] = p
+
+    # Total number of ayahs per surah (edition-independent, from words.csv).
+    surah_ayah_count: dict[int, int] = {}
+    for w in words.values():
+        s = w["s"]
+        a = w["a"]
+        if a > surah_ayah_count.get(s, 0):
+            surah_ayah_count[s] = a
 
     juz_start_page: dict[int, int] = {}
     for j, (s, a) in JUZ_STARTS.items():
-        start = None
-        for wid, w in words.items():
-            if w["s"] == s and w["a"] == a and w["n"] == 1:
-                start = mapping[wid]["page"]
-                break
+        start = ayah_start_page.get(f"{s}:{a}")
         juz_start_page[j] = start if start is not None else 1
 
     return {
         "numPages": 604,
         "surahNames": SURAH_NAMES,
         "surahStartPage": {str(k): v for k, v in surah_start_page.items()},
+        "surahAyahCount": {str(k): v for k, v in surah_ayah_count.items()},
+        "ayahStartPage": ayah_start_page,
         "juzStartPage": {str(k): v for k, v in juz_start_page.items()},
     }
 

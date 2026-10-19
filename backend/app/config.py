@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # --- database ---
-    database_url: str = "postgresql+asyncpg://quran_tracker:Bismillah%406204@localhost:5432/quran_tracker"
+    database_url: str = "postgresql+asyncpg://quran_tracker:CHANGE_ME@localhost:5432/quran_tracker"
 
     # --- auth ---
     access_token_expire_minutes: int = 15

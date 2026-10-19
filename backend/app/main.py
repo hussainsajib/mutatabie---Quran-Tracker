@@ -16,7 +16,13 @@ from .mushaf import load_words_meta
 from .rate_limit import limiter
 from .routers import auth, marks, preferences
 
-DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+# Locate the built frontend. In a repo checkout the backend lives at
+# <repo>/backend/app (dist at <repo>/frontend/dist); in the Docker image the
+# backend is copied flat into /app (dist at /app/frontend/dist).
+_HERE = Path(__file__).resolve().parent
+DIST = _HERE.parent.parent / "frontend" / "dist"
+if not DIST.exists():
+    DIST = _HERE.parent / "frontend" / "dist"
 
 
 def _rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
@@ -71,9 +77,9 @@ async def security_headers(request: Request, call_next):
         "default-src 'self'; "
         "script-src 'self'; "
         "style-src 'self' 'unsafe-inline'; "
-        "font-src 'self'; "
+        "font-src 'self' https://storage.googleapis.com; "
         "img-src 'self' data:; "
-        "connect-src 'self'; "
+        "connect-src 'self' https://storage.googleapis.com; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
         "form-action 'self'"
@@ -94,10 +100,11 @@ async def health() -> dict:
 
 
 # --- Static frontend serving (production only; Vite serves in dev) ---
+# /fonts serves only the small Amiri UI fonts; the QPC page fonts and the
+# mushaf JSON data are served from GCS (see VITE_ASSETS_URL in the frontend).
 if DIST.exists():
     app.mount("/assets", StaticFiles(directory=DIST / "assets"), name="assets")
     app.mount("/fonts", StaticFiles(directory=DIST / "fonts"), name="fonts")
-    app.mount("/mushaf", StaticFiles(directory=DIST / "mushaf"), name="mushaf")
 
     @app.get("/{full_path:path}", include_in_schema=False)
     async def spa_fallback(full_path: str):

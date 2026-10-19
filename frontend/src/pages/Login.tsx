@@ -19,6 +19,7 @@ export function Login() {
   const { user, login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [searchParams] = useSearchParams();
@@ -44,10 +45,11 @@ export function Login() {
     <div className="auth-shell">
       <form className="auth-card" onSubmit={handleSubmit}>
         <div className="auth-brand">
-          <span className="auth-brand-sub">Quran Tracker</span>
+          <span className="auth-mark">متتبع</span>
+          <h1 className="auth-title">Quran Tracker</h1>
+          <div className="auth-mark-divider">✦ &nbsp; ✦ &nbsp; ✦</div>
         </div>
 
-        <h1>Sign in</h1>
         <p className="auth-hint">Track your hifdh and tajweed mistakes, word by word.</p>
 
         {(oauthError && ERROR_MESSAGES[oauthError]) ||
@@ -80,27 +82,113 @@ export function Login() {
           <span>or use email</span>
         </div>
 
-        <label className="field">
-          <span>Email</span>
+        <div className="auth-field-icon">
+          <svg
+            className="auth-field-icon-svg"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 256 256"
+            aria-hidden="true"
+          >
+            <rect width="256" height="256" fill="none" />
+            <circle
+              cx="128"
+              cy="128"
+              r="40"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="24"
+            />
+            <path
+              d="M184,208c-15.21,10.11-36.37,16-56,16a96,96,0,1,1,96-96c0,22.09-8,40-28,40s-28-17.91-28-40V88"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="24"
+            />
+          </svg>
           <input
+            className="auth-input"
             type="email"
             autoComplete="email"
+            placeholder="Email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-        </label>
+        </div>
 
-        <label className="field">
-          <span>Password</span>
-          <input
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
+        <div className="auth-field-icon">
+          <svg
+            className="auth-field-icon-svg"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 16 20"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M11.5 8V4.5a3.5 3.5 0 1 0-7 0V8M8 12v3M2 8h12a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
+            />
+          </svg>
+          <div className="auth-password-wrap">
+            <input
+              className="auth-input"
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              placeholder="Password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              className="auth-eye-toggle"
+              onClick={() => setShowPassword((s) => !s)}
+              tabIndex={-1}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M10.7302 5.07319C11.1448 5.02485 11.5684 5 11.9999 5C16.6639 5 20.3998 7.90264 21.9999 12C21.6053 13.0104 21.0809 13.9482 20.4446 14.7877M6.51956 6.51944C4.47949 7.76406 2.90105 9.69259 1.99994 12C3.60008 16.0974 7.33597 19 11.9999 19C14.0375 19 15.8979 18.446 17.4805 17.4804M9.87871 9.87859C9.33576 10.4215 8.99994 11.1715 8.99994 12C8.99994 13.6569 10.3431 15 11.9999 15C12.8284 15 13.5785 14.6642 14.1214 14.1212"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path d="M4 4L20 20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M2 12C3.60014 7.90264 7.33603 5 12 5C16.664 5 20.3999 7.90264 22 12C20.3999 16.0974 16.664 19 12 19C7.33603 19 3.60014 16.0974 2 12Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
 
         <button className="btn btn-primary" type="submit" disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}

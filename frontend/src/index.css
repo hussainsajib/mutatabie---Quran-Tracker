@@ -22,6 +22,44 @@
   --font-ar: "Amiri", "Scheherazade New", "Traditional Arabic", serif;
 }
 
+/* Amiri — self-hosted (arabic + latin subsets) for surah names */
+@font-face {
+  font-family: "Amiri";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/amiri-regular.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+2010-2011,
+    U+204F, U+2E41, U+FB50-FDFF, U+FE70-FEFC, U+1EE00-1EEFF;
+}
+@font-face {
+  font-family: "Amiri";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/amiri-regular-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2212, U+FFFD;
+}
+@font-face {
+  font-family: "Amiri";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/amiri-bold.woff2") format("woff2");
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200E, U+2010-2011,
+    U+204F, U+2E41, U+FB50-FDFF, U+FE70-FEFC, U+1EE00-1EEFF;
+}
+@font-face {
+  font-family: "Amiri";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/amiri-bold-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2212, U+FFFD;
+}
+
 html.dark {
   --bg: #121614;
   --surface: #1a201d;
@@ -72,16 +110,17 @@ button {
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: var(--bg);
+  background: linear-gradient(
+    160deg,
+    var(--accent-soft) 0%,
+    var(--bg) 45%,
+    var(--surface-2) 100%
+  );
 }
 
 .auth-card {
   width: 100%;
   max-width: 400px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px 30px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -89,35 +128,39 @@ button {
 
 .auth-brand {
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 4px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
 }
 
-.auth-brand-ar {
+.auth-mark {
   font-family: var(--font-ar);
-  font-size: 1.9rem;
+  font-size: 3rem;
+  line-height: 1;
   font-weight: 700;
   color: var(--accent-dark);
 }
 
-.auth-brand-sub {
-  font-size: 0.8rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
+.auth-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--accent-dark);
 }
 
-.auth-card h1 {
-  margin: 0;
-  font-size: 1.35rem;
-  font-weight: 700;
+.auth-mark-divider {
+  color: var(--accent);
+  letter-spacing: 10px;
+  font-size: 0.7rem;
+  opacity: 0.8;
 }
 
 .auth-hint {
   margin: -6px 0 0;
   color: var(--ink-muted);
   font-size: 0.9rem;
+  text-align: center;
 }
 
 .auth-error {
@@ -145,6 +188,79 @@ button {
   flex: 1;
   height: 1px;
   background: var(--border);
+}
+
+.auth-field-icon {
+  position: relative;
+}
+
+.auth-field-icon .auth-input {
+  padding-left: 2.5rem;
+}
+
+.auth-field-icon-svg {
+  position: absolute;
+  top: 50%;
+  left: 0.85rem;
+  transform: translateY(-50%);
+  color: var(--ink-muted);
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.auth-input {
+  font-family: inherit;
+  font-size: 0.95rem;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--ink);
+  outline: none;
+}
+
+.auth-input::placeholder {
+  color: var(--ink-muted);
+  opacity: 0.7;
+}
+
+.auth-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.auth-password-wrap {
+  position: relative;
+}
+
+.auth-password-wrap .auth-input {
+  padding-right: 2.5rem;
+}
+
+.auth-eye-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.6rem;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0.25rem;
+  color: var(--ink-muted);
+  cursor: pointer;
+  line-height: 0;
+  display: inline-flex;
+}
+
+.auth-eye-toggle:hover {
+  color: var(--accent);
+}
+
+.auth-card .btn-primary {
+  background: linear-gradient(135deg, var(--accent-dark), var(--accent));
 }
 
 .auth-switch {
@@ -258,7 +374,7 @@ button {
   flex-wrap: wrap;
   gap: 10px 16px;
   align-items: center;
-  padding: 10px 16px;
+  padding: 6px 16px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }
@@ -267,6 +383,7 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
+  order: 1;
 }
 
 .toolbar-brand-ar {
@@ -283,21 +400,17 @@ button {
   color: var(--ink-muted);
 }
 
-.marks-badge {
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.72rem;
-  font-weight: 700;
-  border-radius: 999px;
-  padding: 2px 8px;
-}
-
 .toolbar-nav {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  flex: 1 1 320px;
+  flex: 1 1 100%;
+  order: 3;
+}
+
+.toolbar-nav .nav-mode {
+  margin-inline-start: auto;
 }
 
 .nav-btn {
@@ -308,8 +421,8 @@ button {
   background: var(--surface-2);
   color: var(--ink);
   border-radius: 8px;
-  min-width: 34px;
-  height: 34px;
+  min-width: 30px;
+  height: 30px;
   padding: 0 10px;
   font-size: 0.95rem;
 }
@@ -319,35 +432,76 @@ button {
   cursor: not-allowed;
 }
 
+.nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
 .page-input {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
+  font-size: 0.65rem;
   color: var(--ink-muted);
 }
 
 .page-input input {
   width: 64px;
-  height: 34px;
+  height: 30px;
   text-align: center;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface-2);
   color: var(--ink);
-  font-size: 0.9rem;
+  font-size: 0.65rem;
 }
 
 .toolbar-select select {
-  height: 34px;
+  height: 30px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface-2);
   color: var(--ink);
   padding: 0 8px;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.65rem;
   max-width: 180px;
+}
+
+.toolbar-autocomplete-surah {
+  width: 180px;
+  max-width: 100%;
+}
+
+.toolbar-autocomplete-ayah {
+  width: 64px;
+}
+
+.ac-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.ac-option-en {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ac-option-ar {
+  flex-shrink: 0;
+  font-family: var(--font-ar);
+  color: var(--ink-muted);
 }
 
 .toolbar-right {
@@ -355,6 +509,7 @@ button {
   align-items: center;
   gap: 8px;
   margin-inline-start: auto;
+  order: 2;
 }
 
 .font-controls {
@@ -375,12 +530,59 @@ button {
 /* ─────────────────────────── Mushaf page ─────────────────────────── */
 .mushaf-main {
   padding: 14px 16px 24px;
+  touch-action: pan-y;
+}
+
+/* ─────────────────────────── Tajweed legend ─────────────────────────── */
+/* Swatch colors mirror the KFGQPC V4 tajweed mushaf palette (data colors). */
+.tajweed-legend {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 3px 12px;
+  padding: 4px 10px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: 0.6rem;
+  line-height: 1.3;
+  color: var(--ink-muted);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.legend-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.swatch-red-darkest { background: #6e1a1a; } /* design-ok */
+.swatch-red-dark { background: #9e2b25; } /* design-ok */
+.swatch-red { background: #c0503c; } /* design-ok */
+.swatch-red-light { background: #db7a66; } /* design-ok */
+.swatch-green { background: #1e9b50; } /* design-ok */
+.swatch-gray { background: #8a8a8a; } /* design-ok */
+.swatch-dark-blue { background: #1f4e79; } /* design-ok */
+.swatch-light-blue { background: #9dc3e6; } /* design-ok */
+
+.has-legend .mushaf-main {
+  padding-bottom: 40px;
 }
 
 .frame {
-  background: var(--surface);
-  border: 3px double var(--accent);
-  border-radius: 12px;
+  container-type: inline-size;
   margin: 0 auto;
   max-width: 1180px;
   padding: 20px 18px;
@@ -397,7 +599,7 @@ button {
 .quran-page {
   direction: rtl;
   font-size: 1.25rem;
-  line-height: 2.6;
+  line-height: 2.1;
   width: max-content;
 }
 
@@ -413,18 +615,36 @@ button {
   justify-content: center;
 }
 
-.line-surah-name {
+.surah-header {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.6rem;
-  font-size: 1.9rem;
-  line-height: 1.2;
-  margin: 4px auto 12px;
-  padding: 0.35em 1.6em;
-  border: 2px solid var(--accent);
-  border-radius: 12px;
-  box-shadow: inset 0 0 0 1px var(--surface), 0 0 0 1px var(--accent);
+  gap: 0.12em;
+  width: 100%;
+  aspect-ratio: 1138 / 263;
+  font-size: 13cqw;
+  line-height: 1;
+  margin: 2px 0 2px;
+  direction: rtl;
+}
+
+.surah-header-frame {
+  position: absolute;
+  inset: 0;
+  color: inherit;
+}
+
+.surah-header-frame svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.surah-header .surah-name-v4-icon {
+  position: relative;
+  z-index: 1;
+  color: var(--ink);
 }
 
 .surah-name-v4-icon {
@@ -434,44 +654,13 @@ button {
 .line-basmallah {
   display: block;
   font-size: 1.4rem;
+  line-height: 1.5;
   text-align: center;
-  position: relative;
-  margin-bottom: 1.4em;
+  margin-bottom: 4px;
 }
 
 .basmallah-glyph {
   font-family: "QCF4_Hafs_01";
-}
-
-.line-basmallah::before,
-.line-basmallah::after {
-  content: "\FD3E";
-  color: var(--accent);
-  font-size: 1rem;
-  margin: 0 6px;
-}
-
-.line-basmallah::after {
-  content: "\FD3F";
-}
-
-.line-basmallah .rule {
-  position: absolute;
-  left: 15%;
-  right: 15%;
-  top: 100%;
-  border-top: 1.5px solid var(--accent);
-  opacity: 0.5;
-}
-
-.line-basmallah .diamond {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  width: 0.5em;
-  height: 0.5em;
-  background: var(--accent);
-  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .quran-word {
@@ -498,24 +687,14 @@ button {
 
 .quran-word.marked-hifdh {
   background: var(--hifdh-bg);
-  box-shadow: inset 0 -2px 0 var(--hifdh);
 }
 
 .quran-word.marked-tajweed {
   background: var(--tajweed-bg);
-  box-shadow: inset 0 -2px 0 var(--tajweed);
 }
 
 .quran-word.marked-hifdh.marked-tajweed {
   background: var(--both-bg);
-  box-shadow: inset 0 -2px 0 var(--hifdh), inset 0 -4px 0 var(--tajweed);
-}
-
-.mushaf-footer {
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--ink-muted);
-  padding: 4px 16px 20px;
 }
 
 .mushaf-loading,
@@ -642,10 +821,99 @@ button {
 
 @media (max-width: 640px) {
   .toolbar {
-    padding: 8px 10px;
+    padding: 6px 10px;
+  }
+  .user-chip {
+    display: none;
+  }
+  .mushaf-main {
+    padding: 8px 6px 16px;
   }
   .frame {
-    padding: 12px 10px;
+    padding: 8px 4px;
+  }
+  .mushaf-fit {
+    overflow: visible;
+  }
+  .surah-header-frame {
+    left: 50%;
+    right: auto;
+    width: 100vw;
+    transform: translateX(-50%);
+  }
+  .modal-backdrop {
+    padding: 12px;
+  }
+  .modal-card {
+    padding: 16px;
+    gap: 10px;
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+  }
+  .modal-close {
+    top: 8px;
+    inset-inline-end: 8px;
+  }
+  .modal-word {
+    font-size: 1.7rem;
+  }
+  .modal-loc {
+    font-size: 0.76rem;
+  }
+  .modal-types {
+    gap: 6px;
+  }
+  .type-btn {
+    padding: 8px 6px;
+  }
+  .field textarea {
+    min-height: 56px;
+    padding: 8px 10px;
+  }
+  .modal-meta {
+    font-size: 0.75rem;
+  }
+  .modal-actions {
+    gap: 8px;
+  }
+  .modal-actions .btn {
+    flex: 1;
+    padding: 9px 12px;
+  }
+  .settings-shell {
+    padding: 16px 5vw 40px;
+  }
+  .settings-card {
+    gap: 16px;
+  }
+  .settings-summary {
+    font-size: 0.75rem;
+  }
+  .settings-section h3 {
+    font-size: 0.7rem;
+  }
+  .settings-hint {
+    font-size: 0.78rem;
+  }
+  .mushaf-option-label {
+    font-size: 0.85rem;
+  }
+  .mushaf-option-desc {
+    font-size: 0.72rem;
+  }
+  .profile-row dt,
+  .profile-row dd {
+    font-size: 0.8rem;
+  }
+  .session-time {
+    font-size: 0.82rem;
+  }
+  .session-detail {
+    font-size: 0.75rem;
+  }
+  .session-count {
+    font-size: 0.72rem;
   }
 }
 
@@ -660,10 +928,7 @@ button {
   width: 100%;
   max-width: 560px;
   margin: 0 auto;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 28px 30px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -703,6 +968,15 @@ button {
 .settings-section h2 {
   margin: 0;
   font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.settings-section h3 {
+  margin: 0;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -796,4 +1070,200 @@ button {
 .settings-actions {
   display: flex;
   justify-content: flex-end;
+}
+
+/* ── Collapsible section header ── */
+.settings-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: start;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+.collapse-caret {
+  transition: transform 0.15s ease;
+}
+
+.collapse-caret.open {
+  transform: rotate(180deg);
+}
+
+.settings-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Profile ── */
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.profile-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 0;
+}
+
+.profile-row dt {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.profile-row dd {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+
+/* ── Marking history ── */
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.session-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink);
+  transition: border-color 0.12s ease, background 0.12s ease;
+  overflow: hidden;
+}
+
+.session-item:hover {
+  border-color: var(--accent);
+}
+
+.session-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.session-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: start;
+  padding: 12px 14px;
+  border: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.session-caret {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: var(--ink-muted);
+  padding: 0 14px;
+  cursor: pointer;
+}
+
+.session-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.session-time {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.session-count {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.session-detail {
+  font-size: 0.82rem;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.session-loc {
+  font-size: 0.76rem;
+  color: var(--ink-muted);
+  line-height: 1.4;
+}
+
+.session-breakdown {
+  border-top: 1px solid var(--border);
+  padding: 8px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.breakdown-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.breakdown-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.breakdown-loc {
+  font-size: 0.78rem;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+/* ── Session banner (mushaf page) ── */
+.session-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  max-width: 1180px;
+  margin: 0 auto 8px;
+  padding: 8px 12px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: var(--ink);
+}
+
+.session-banner-clear {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
 }

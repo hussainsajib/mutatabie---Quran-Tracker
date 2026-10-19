@@ -1,11 +1,16 @@
 import type { MushafEdition, MushafIndex, PageData } from "./types";
 
+// Base URL for static assets (mushaf JSON + page fonts). Empty in dev so the
+// Vite dev server serves them from /public; set to the GCS bucket in production
+// via VITE_ASSETS_URL (frontend/.env.production).
+const ASSETS_BASE = import.meta.env.VITE_ASSETS_URL ?? "";
+
 const indexCache: Partial<Record<MushafEdition, MushafIndex>> = {};
 
 export async function loadIndex(edition: MushafEdition): Promise<MushafIndex> {
   const cached = indexCache[edition];
   if (cached) return cached;
-  const res = await fetch(`/mushaf/${edition}/index.json`);
+  const res = await fetch(`${ASSETS_BASE}/mushaf/${edition}/index.json`);
   if (!res.ok) throw new Error(`Failed to load mushaf index: HTTP ${res.status}`);
   const index = (await res.json()) as MushafIndex;
   indexCache[edition] = index;
@@ -13,7 +18,7 @@ export async function loadIndex(edition: MushafEdition): Promise<MushafIndex> {
 }
 
 export async function loadPage(edition: MushafEdition, page: number): Promise<PageData> {
-  const res = await fetch(`/mushaf/${edition}/pages/${page}.json`);
+  const res = await fetch(`${ASSETS_BASE}/mushaf/${edition}/pages/${page}.json`);
   if (!res.ok) throw new Error(`Failed to load page ${page}: HTTP ${res.status}`);
   return (await res.json()) as PageData;
 }
@@ -39,10 +44,10 @@ export function injectFontFace(name: string): void {
   // The basmalah font file carries a `_W` suffix on disk, unlike its family name.
   const pageMatch = /^(v[124])-p(\d+)$/.exec(name);
   const url = pageMatch
-    ? `/fonts/qpc${pageMatch[1]}/p${pageMatch[2]}.woff2`
+    ? `${ASSETS_BASE}/fonts/qpc${pageMatch[1]}/p${pageMatch[2]}.woff2`
     : name === "QCF4_Hafs_01"
-      ? `/fonts/QCF4_Hafs_01_W.woff2`
-      : `/fonts/${name}.woff2`;
+      ? `${ASSETS_BASE}/fonts/QCF4_Hafs_01_W.woff2`
+      : `${ASSETS_BASE}/fonts/${name}.woff2`;
 
   const style = document.createElement("style");
   style.setAttribute("data-face", name);

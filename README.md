@@ -73,6 +73,13 @@ docker-compose.yml     local Postgres + app
 ## Quick start (Docker)
 
 ```bash
+# 1. create the local env file (gitignored) and set a database password
+cp .env.example .env
+#    then edit .env: set POSTGRES_PASSWORD (and POSTGRES_PASSWORD_ENCODED if
+#    the password has special chars like @). Generate one with:
+#    python -c "import secrets; print(secrets.token_hex(24))"
+
+# 2. start the stack
 docker compose up --build
 ```
 
@@ -86,14 +93,15 @@ the database automatically.
 ## Local development (hot reload)
 
 ```bash
-# 1. database
+# 1. database — needs the repo-root .env (copy from .env.example, set POSTGRES_PASSWORD)
+cp .env.example .env
 docker compose up -d db
 
 # 2. backend (from the backend/ directory)
 cd backend
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp ../.env.example .env          # then edit DATABASE_URL to point at localhost
+cp ../.env.example .env          # then edit DATABASE_URL to point at localhost with the SAME password (URL-encoded)
 alembic upgrade head
 uvicorn app.main:app --reload --port 5100
 
@@ -136,8 +144,9 @@ Generate a production secret: `python -c "import secrets; print(secrets.token_ur
 1. Create a project at [neon.tech](https://neon.tech) and copy the connection
    string.
 2. It looks like `postgresql://user:password@host/db?sslmode=require`. For
-   SQLAlchemy async, use the `asyncpg` driver and add `sslmode=require`:
-   `postgresql+asyncpg://user:password@host/db?sslmode=require`.
+   SQLAlchemy async, use the `asyncpg` driver and replace `sslmode=require`
+   with `ssl=require` (asyncpg doesn't understand `sslmode`):
+   `postgresql+asyncpg://user:password@host/db?ssl=require`.
 
 ## Deploying to Google Cloud Run
 

@@ -27,6 +27,8 @@ export interface MushafIndex {
   numPages: number;
   surahNames: Record<string, string>;
   surahStartPage: Record<string, number>;
+  surahAyahCount: Record<string, number>;
+  ayahStartPage: Record<string, number>;
   juzStartPage: Record<string, number>;
 }
 

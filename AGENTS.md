@@ -8,7 +8,7 @@ Quran Tracker: self-hosted app for word-by-word hifdh/tajweed mistake marking on
 - Backend dev (from `backend/`): `uvicorn app.main:app --reload --port 5100`. Run `alembic upgrade head` first.
 - Frontend dev (from `frontend/`): `npm run dev` → http://localhost:5173; Vite proxies `/api` to :5100 so cookies stay same-origin.
 - Frontend typecheck + build: `npm run build` (runs `tsc && vite build`).
-- Local Postgres only: `docker compose up -d db` — user/db `quran_tracker`, password `Bismillah@6204`, matching `config.py` defaults so backend dev works with no `.env`.
+- Local Postgres only: `docker compose up -d db` — user/db `quran_tracker`; the password is read from `POSTGRES_PASSWORD` in the repo-root `.env` (gitignored, see `.env.example`). Backend dev needs a `backend/.env` with a `DATABASE_URL` using the same password.
 - Regenerate mushaf data (from repo root): `python scripts/build_mushaf_json.py`.
 
 Alembic must run from `backend/` (`prepend_sys_path = .`). The DB URL comes from the `DATABASE_URL` env var / `.env`, not `alembic.ini`.

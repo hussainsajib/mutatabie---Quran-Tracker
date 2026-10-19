@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { loadPage, fontsForPage, injectFontFace } from "../mushaf/loader";
 import type { Line, MistakeType, MushafEdition, Word } from "../mushaf/types";
+import surahHeaderFrame from "../assets/surah-header-frame.svg?raw";
 
-const ORNAMENT = 0xe000; // surah header leading ornament
+const SURAH_WORD = 0xe000; // calligraphic "سُورَةُ" prefix glyph (the word "surah")
 const BASMALLAH = 0xf8dd; // basmallah glyph in QCF4_Hafs_01
 const MAX_GAP = 1.0; // max per-gap stretch (em) before flushing a short line
 
@@ -43,7 +44,14 @@ export function MushafPage({ edition, page, fontScale, marksByWord, onWordClick 
     const natural = pageEl.offsetWidth;
     const avail = frameEl.clientWidth - 16; // pad for sub-pixel rounding
     if (natural && avail > 0) {
-      pageEl.style.fontSize = `${baseSize * fontScale * Math.min(1, avail / natural)}px`;
+      const ratio = avail / natural;
+      // On small screens the text should fill the width snugly, so allow the
+      // page to scale up (not just shrink) to reach the available width. On
+      // larger screens keep the shrink-to-fit behavior so desktop stays put.
+      const scale = window.matchMedia("(max-width: 640px)").matches
+        ? ratio
+        : Math.min(1, ratio);
+      pageEl.style.fontSize = `${baseSize * fontScale * scale}px`;
     }
 
     const fontSize = parseFloat(pageEl.style.fontSize) || baseSize;
@@ -119,13 +127,19 @@ function LineView({
   onWordClick: (word: Word) => void;
 }) {
   if (line.type === "surah_name") {
+    const surah = line.surah ?? 0;
     return (
-      <p className="quran-line line-surah-name">
-        <span className="surah-name-v4-icon">{String.fromCodePoint(ORNAMENT)}</span>
+      <div className="surah-header">
+        <div
+          className="surah-header-frame"
+          aria-hidden="true"
+          dangerouslySetInnerHTML={{ __html: surahHeaderFrame }}
+        />
+        <span className="surah-name-v4-icon">{String.fromCodePoint(SURAH_WORD)}</span>
         <span className="surah-name-v4-icon">
-          {String.fromCodePoint(ORNAMENT + (line.surah ?? 0))}
+          {String.fromCodePoint(SURAH_WORD + surah)}
         </span>
-      </p>
+      </div>
     );
   }
 
@@ -133,8 +147,6 @@ function LineView({
     return (
       <p className="quran-line line-basmallah">
         <span className="basmallah-glyph">{String.fromCodePoint(BASMALLAH)}</span>
-        <span className="rule" />
-        <span className="diamond" />
       </p>
     );
   }
