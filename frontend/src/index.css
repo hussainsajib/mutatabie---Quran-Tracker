@@ -329,37 +329,51 @@ button {
 
 .landing-main {
   width: 100%;
-  max-width: 760px;
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 72px 24px 48px;
+  padding: 64px 24px 48px;
   flex: 1;
 }
 
-.landing-mark {
-  margin: 0 0 20px;
-  font-family: var(--font-ar);
-  font-size: 3.25rem;
+.landing-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.landing-eyebrow {
+  margin: 0 0 14px;
+  font-size: 0.78rem;
   font-weight: 700;
-  line-height: 1.1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--accent-dark);
 }
 
 .landing-title {
   margin: 0 0 18px;
-  font-size: clamp(1.9rem, 5vw, 2.9rem);
+  font-size: clamp(2rem, 5.5vw, 3.2rem);
   font-weight: 800;
-  line-height: 1.12;
+  line-height: 1.1;
   letter-spacing: -0.02em;
   color: var(--ink);
-  max-width: 20ch;
+  max-width: 16ch;
+}
+
+.landing-title em {
+  font-style: normal;
+  color: var(--accent);
+  background: linear-gradient(transparent 62%, var(--hifdh-bg) 62%);
 }
 
 .landing-sub {
-  margin: 0 0 30px;
+  margin: 0 0 28px;
   font-size: 1.05rem;
   line-height: 1.6;
   color: var(--ink-muted);
-  max-width: 54ch;
+  max-width: 50ch;
 }
 
 .landing-cta {
@@ -368,67 +382,64 @@ button {
   gap: 12px;
 }
 
-.landing-cta .btn {
+.landing-cta .btn,
+.landing-final .btn {
   padding: 12px 22px;
   font-size: 1rem;
 }
 
-.landing-rule {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 56px 0 0;
-}
-
-.landing-ledger {
+.landing-trust {
   list-style: none;
-  margin: 0;
+  margin: 26px 0 0;
   padding: 0;
   display: flex;
-  flex-direction: column;
-}
-
-.landing-ledger li {
-  display: flex;
-  gap: 20px;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.ledger-num {
-  flex-shrink: 0;
-  padding-top: 2px;
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-  color: var(--accent-dark);
-}
-
-.ledger-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.ledger-body strong {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.ledger-body span {
-  font-size: 0.92rem;
-  line-height: 1.55;
-  color: var(--ink-muted);
-  max-width: 60ch;
-}
-
-.landing-mistakes {
-  display: flex;
   flex-wrap: wrap;
-  gap: 8px 28px;
-  margin-top: 28px;
-  font-size: 0.85rem;
+  gap: 6px 18px;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.landing-trust li::before {
+  content: "✓";
+  margin-inline-end: 6px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Static mushaf preview */
+.landing-preview {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preview-page {
+  /* explicit width: .frame uses inline-size containment, so it has no intrinsic width */
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transform: rotate(-1.2deg);
+}
+
+.preview-page .frame {
+  padding: 12px;
+}
+
+.preview-page .quran-word {
+  cursor: default;
+}
+
+.preview-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  font-size: 0.82rem;
   color: var(--ink-muted);
 }
 
@@ -454,12 +465,104 @@ button {
   background: var(--tajweed);
 }
 
+/* Sections */
+.landing-section {
+  margin-top: 80px;
+}
+
+.landing-h2 {
+  margin: 0 0 24px;
+  font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.landing-steps,
+.landing-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.landing-steps li,
+.landing-cards li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.landing-steps strong,
+.landing-cards strong {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.landing-steps li > span:not(.step-num),
+.landing-cards li > span {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 4px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-dark);
+  background: var(--accent-soft);
+}
+
+.landing-final {
+  margin-top: 80px;
+  padding: 40px 24px;
+  text-align: center;
+  background: var(--accent-soft);
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 4px);
+}
+
+.landing-final h2 {
+  margin: 0 0 20px;
+  font-size: clamp(1.3rem, 3.4vw, 1.8rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
 .landing-footer {
   padding: 20px 24px;
   border-top: 1px solid var(--border);
   text-align: center;
   font-size: 0.8rem;
   color: var(--ink-muted);
+}
+
+@media (min-width: 760px) {
+  .landing-hero {
+    grid-template-columns: 1.1fr 1fr;
+    gap: 56px;
+  }
+  .landing-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .landing-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 640px) {
@@ -470,14 +573,115 @@ button {
     display: none;
   }
   .landing-main {
-    padding: 48px 20px 40px;
+    padding: 40px 20px 40px;
   }
-  .landing-mark {
-    font-size: 2.5rem;
+  .landing-section,
+  .landing-final {
+    margin-top: 56px;
   }
   .landing-cta .btn {
     flex: 1;
     padding: 12px 16px;
+  }
+}
+
+/* Clip art */
+.hero-star,
+.hero-crescent,
+.final-mosque,
+.divider-star {
+  color: var(--accent);
+  pointer-events: none;
+}
+
+.hero-star {
+  position: absolute;
+  top: -70px;
+  right: -90px;
+  width: 340px;
+  opacity: 0.1;
+  z-index: -1;
+  animation: landing-spin 90s linear infinite;
+}
+
+.hero-crescent {
+  position: absolute;
+  top: -44px;
+  left: -4px;
+  width: 40px;
+  color: var(--hifdh);
+  animation: landing-float 6s ease-in-out infinite;
+}
+
+.landing-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 72px;
+}
+
+.landing-divider span {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.divider-star {
+  width: 28px;
+  opacity: 0.75;
+}
+
+.final-mosque {
+  display: block;
+  width: min(220px, 60%);
+  margin: 0 auto 18px;
+  opacity: 0.85;
+}
+
+@keyframes landing-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes landing-float {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Scroll reveal */
+.reveal,
+.landing-steps li,
+.landing-cards li {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal.in-view,
+.reveal.in-view li {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal-delay {
+  transition-delay: 0.15s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .landing-steps li,
+  .landing-cards li {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .hero-star,
+  .hero-crescent {
+    animation: none;
   }
 }
 
@@ -1560,8 +1764,7 @@ button {
     font-size: 0.9rem;
   }
   .landing-main {
-    max-width: 880px;
-    padding: 96px 32px 64px;
+    padding: 88px 32px 64px;
   }
   .landing-nav {
     padding: 18px 40px;

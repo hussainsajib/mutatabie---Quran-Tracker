@@ -144,9 +144,9 @@ export function Toolbar({
           <>
             <button
               className="nav-btn"
-              onClick={() => goto(page - 1)}
-              disabled={page <= 1}
-              aria-label="Previous page"
+              onClick={() => goto(page + 1)}
+              disabled={page >= numPages}
+              aria-label="Next page"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -169,9 +169,9 @@ export function Toolbar({
             </label>
             <button
               className="nav-btn"
-              onClick={() => goto(page + 1)}
-              disabled={page >= numPages}
-              aria-label="Next page"
+              onClick={() => goto(page - 1)}
+              disabled={page <= 1}
+              aria-label="Previous page"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

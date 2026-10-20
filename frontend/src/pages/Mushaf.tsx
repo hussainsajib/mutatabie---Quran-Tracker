@@ -125,8 +125,9 @@ export function Mushaf() {
       ) {
         return;
       }
-      if (e.key === "ArrowLeft") goto(page - 1);
-      if (e.key === "ArrowRight") goto(page + 1);
+      // Right-to-left book: left arrow turns forward, right arrow turns back.
+      if (e.key === "ArrowLeft") goto(page + 1);
+      if (e.key === "ArrowRight") goto(page - 1);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
